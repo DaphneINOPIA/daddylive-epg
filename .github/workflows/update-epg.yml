@@ -1,20 +1,31 @@
-- name: Checkout repository
-  uses: actions/checkout@v3
-  with:
-    persist-credentials: false  # So we can manually set up authentication for push
+name: Update EPG
 
-- name: Setup Git to push with token
-  run: |
-    git config --global user.name "github-actions"
-    git config --global user.email "github-actions@github.com"
-    git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+on:
+  schedule:
+    - cron: '0 */3 * * *'  # Every 3 hours
+  workflow_dispatch:
 
-- name: Download EPG file from pigzillaaaaa/daddylive
-  run: |
-    curl -L "https://raw.githubusercontent.com/pigzillaaaaa/daddylive/main/epgs/daddylive-channels-epg.xml" -o epg.xml
+jobs:
+  update-epg:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false  # So we can manually set up authentication for push
 
-- name: Commit and push changes
-  run: |
-    git add epg.xml
-    git commit -m "Update EPG" || exit 0
-    git push origin main
+      - name: Setup Git to push with token
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+      - name: Download EPG file from pigzillaaaaa/daddylive
+        run: |
+          curl -L "https://raw.githubusercontent.com/pigzillaaaaa/daddylive/main/epgs/daddylive-channels-epg.xml" -o epg.xml
+
+      - name: Commit and push changes
+        run: |
+          git add epg.xml
+          git commit -m "Update EPG" || exit 0
+          git push origin main
