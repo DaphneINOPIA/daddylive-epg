@@ -1,28 +1,20 @@
-name: Update EPG
+- name: Checkout repository
+  uses: actions/checkout@v3
+  with:
+    persist-credentials: false  # So we can manually set up authentication for push
 
-on:
-  schedule:
-    - cron: '0 */3 * * *'  # Every 3 hours
-  workflow_dispatch:
+- name: Setup Git to push with token
+  run: |
+    git config --global user.name "github-actions"
+    git config --global user.email "github-actions@github.com"
+    git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
-jobs:
-  update-epg:
-    runs-on: ubuntu-latest
+- name: Download EPG file from pigzillaaaaa/daddylive
+  run: |
+    curl -L "https://raw.githubusercontent.com/pigzillaaaaa/daddylive/main/epgs/daddylive-channels-epg.xml" -o epg.xml
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Download EPG file from pigzillaaaaa/daddylive
-        run: |
-          curl -L "https://raw.githubusercontent.com/pigzillaaaaa/daddylive/main/epgs/daddylive-channels-epg.xml" -o epg.xml
-
-      - name: Commit and push changes
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git status
-          git branch
-          git add epg.xml
-          git commit -m "Update EPG" || exit 0
-          git push origin main
+- name: Commit and push changes
+  run: |
+    git add epg.xml
+    git commit -m "Update EPG" || exit 0
+    git push origin main
