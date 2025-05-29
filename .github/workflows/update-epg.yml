@@ -15,7 +15,7 @@ jobs:
 
       - name: Download EPG file from pigzillaaaaa/daddylive
         run: |
-          curl -L "https://raw.githubusercontent.com/pigzillaaaaa/daddylive/main/epg.xml" -o epg.xml
+          curl -L "https://raw.githubusercontent.com/pigzillaaaaa/daddylive/main/epgs/daddylive-channels-epg.xml" -o epg.xml
 
       - name: Commit and push changes
         run: |
